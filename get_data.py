@@ -35,14 +35,51 @@ def get_data(img_path,label_path):
 # format generated
 # pathOfFile NumberOfTarget Position1OfTarget Position2OfTarget
 
-def positive_txtFile_Generator
+def positive_txtFile_Generator(path_label, img_path_txt, new_file):
+
+    lineCount = 0 #for keepin in track for the line to append to in pos
+
+    #open file for postivie sample info
+    pos = open(img_path_txt,'r+')
+    pos_lines = pos.readlines()
+    new = open(new_file,'w')
+    #read file content and append them to the back of the name
+    for filename in os.listdir(path_label):
+        name = os.path.splitext(filename)[0]  
+        #Generates the full path
+        full_path_label = os.path.join(path_label, filename)
     
-#take in 2 
+        #take in all the files and get the content
+        label_file = open(full_path_label)
+        content = label_file.readlines() 
+
+        numOfBuoy = 0
+        labelToAppend = []
+        for labels in content:
+            listOfInt = map(int,re.findall('\d+',labels))
+            numOfBuoy += listOfInt[4]
+            labelToAppend.append(listOfInt[0])
+            labelToAppend.append(listOfInt[1])
+            labelToAppend.append(listOfInt[2])
+            labelToAppend.append(listOfInt[3])
+                        
+        labelToAppend.insert(0,numOfBuoy)
+        #print labelToAppend
+        labelToAppendString = " ".join(map(str, labelToAppend))
+        print labelToAppendString
+        
+        for line in pos_lines:
+            if name in line:
+                line = line.strip()+" "+labelToAppendString
+                new.write(line)
+                new.write('\n')
+                #print line
+        label_file.close()
 
 
+    pos.close()
 
-
-
+    return None
 
 #Takes in the label files and if the file is empty, move them to a negative sample file
 #input the original path of label and image file
@@ -80,6 +117,17 @@ def main():
     move_negative_file(path_label, path_image,destination_label,destination_img)
     #------------------------------------------------------------------------------------ 
     '''
+    #---------------------------------------------------------------------
+    path_label = '/home/amy/Desktop/pos/pos_label'
+    new_file = '/home/amy/Desktop/pos/empty.txt'
+    #ls $PWD/* > pos.txt
+    img_path_txt = '/home/amy/Desktop/pos/pos.txt'
+    positive_txtFile_Generator(path_label,img_path_txt,new_file)
+
+    
+
+    #-------------------------------------------------------------------------------------
+    
     # data = get_data("/home/amy/Desktop/all_data/img/i_245.jpg","/home/amy/Desktop/all_data/label/i_245.txt")
 
 if __name__ == "__main__":
